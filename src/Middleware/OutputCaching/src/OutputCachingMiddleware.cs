@@ -95,7 +95,7 @@ public class OutputCachingMiddleware
             await _policyProvider.OnRequestAsync(context);
 
             // Should we attempt any caching logic?
-            if (context.AttemptResponseCaching)
+            if (context.EnableOutputCaching && context.AttemptResponseCaching)
             {
                 // Can this request be served from cache?
                 if (context.AllowCacheLookup)

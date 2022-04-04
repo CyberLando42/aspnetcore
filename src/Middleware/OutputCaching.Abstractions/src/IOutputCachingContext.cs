@@ -25,7 +25,12 @@ public interface IOutputCachingContext
     ILogger Logger { get; }
 
     /// <summary>
-    /// Determine whether the response caching logic should be attempted for the incoming HTTP request.
+    /// Determine whether the output caching logic should is configured for the incoming HTTP request.
+    /// </summary>
+    bool EnableOutputCaching { get; set; }
+
+    /// <summary>
+    /// Determine whether the output caching logic should be attempted for the incoming HTTP request.
     /// </summary>
     bool AttemptResponseCaching { get; set; }
 

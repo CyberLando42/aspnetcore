@@ -10,8 +10,9 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddOutputCaching(options =>
 {
     // options.Policies.Clear();
+    options.Policies.Add(new EnableCachingPolicy());
 
-    options.Profiles["NoCache"] = new OutputCachePolicyBuilder().NotCacheable().Build();
+    options.Profiles["NoCache"] = new OutputCachePolicyBuilder().NoStore().Build();
 });
 
 var app = builder.Build();
@@ -20,7 +21,11 @@ app.UseOutputCaching();
 
 app.MapGet("/", Gravatar.WriteGravatar).OutputCache(x => x.Tag("home"));
 
-app.MapGet("/nocache", Gravatar.WriteGravatar).OutputCache(x => x.NotCacheable());
+app.MapGet("/a", Gravatar.WriteGravatar).OutputCache();
+
+app.MapGet("/b", Gravatar.WriteGravatar);
+
+app.MapGet("/nocache", Gravatar.WriteGravatar).OutputCache(x => x.NoStore());
 
 app.MapGet("/profile", Gravatar.WriteGravatar).OutputCache(x => x.Profile("NoCache"));
 
@@ -54,5 +59,20 @@ app.MapGet("/headers", async context =>
     context.Response.Headers.CacheControl = CacheControlHeaderValue.PublicString;
     await context.Response.WriteAsync("Headers " + DateTime.UtcNow.ToString("o"));
 }).OutputCache(new ResponseCachingPolicy());
+
+// Etag
+app.MapGet("/etag", async (context) =>
+{
+    // If the client sends an If-None-Match header with the etag value, the server
+    // returns 304 if the cache entry is fresh instead of the full response
+
+    var etag = $"\"{Guid.NewGuid().ToString("n")}\"";
+    context.Response.Headers.ETag = etag;
+
+    await context.Response.WriteAsync("Hello");
+}).OutputCache();
+
+// When the request header If-Modified-Since is provided, return 304 if the cached entry is older
+app.MapGet("/ims", Gravatar.WriteGravatar).OutputCache();
 
 await app.RunAsync();

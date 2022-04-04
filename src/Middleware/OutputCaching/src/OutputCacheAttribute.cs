@@ -53,11 +53,13 @@ public class OutputCacheAttribute : Attribute, IPoliciesMetadata
 
     private List<IOutputCachingPolicy> GetPolicies()
     {
-        var policies = new List<IOutputCachingPolicy>(4);
+        var policies = new List<IOutputCachingPolicy>(5);
+
+        policies.Add(EnableCachingPolicy.Instance);
 
         if (_noStore != null && _noStore.Value)
         {
-            policies.Add(new NoCachingPolicy());
+            policies.Add(new NoStorePolicy());
         }
 
         if (Profile != null)

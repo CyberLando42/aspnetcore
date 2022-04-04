@@ -6,9 +6,8 @@ namespace Microsoft.AspNetCore.OutputCaching;
 /// <summary>
 /// A policy that prevents caching
 /// </summary>
-public class NoCachingPolicy : IOutputCachingPolicy
+public class NoStorePolicy : IOutputCachingPolicy
 {
-
     public Task OnServeResponseAsync(IOutputCachingContext context)
     {
         context.IsResponseCacheable = false;

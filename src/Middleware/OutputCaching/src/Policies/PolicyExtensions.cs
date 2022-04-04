@@ -6,13 +6,14 @@ using Microsoft.AspNetCore.Builder;
 namespace Microsoft.AspNetCore.OutputCaching.Policies;
 public static class PolicyExtensions
 {
-    public static TBuilder OutputCache<TBuilder>(this TBuilder builder, params IOutputCachingPolicy[] items) where TBuilder : IEndpointConventionBuilder
+    public static TBuilder OutputCache<TBuilder>(this TBuilder builder) where TBuilder : IEndpointConventionBuilder
     {
         ArgumentNullException.ThrowIfNull(builder, nameof(builder));
-        ArgumentNullException.ThrowIfNull(items, nameof(items));
 
         var policiesMetadata = new PoliciesMetadata();
-        policiesMetadata.Policies.AddRange(items);
+
+        // Enable caching if this method is invoked on an endpoint, extra policies can disable it
+        policiesMetadata.Policies.Add(EnableCachingPolicy.Instance);
 
         builder.Add(endpointBuilder =>
         {
@@ -20,6 +21,25 @@ public static class PolicyExtensions
         });
         return builder;
     }
+
+    public static TBuilder OutputCache<TBuilder>(this TBuilder builder, params IOutputCachingPolicy[] items) where TBuilder : IEndpointConventionBuilder
+    {
+        ArgumentNullException.ThrowIfNull(builder, nameof(builder));
+        ArgumentNullException.ThrowIfNull(items, nameof(items));
+
+        var policiesMetadata = new PoliciesMetadata();
+
+        // Enable caching if this method is invoked on an endpoint, extra policies can disable it
+        policiesMetadata.Policies.Add(EnableCachingPolicy.Instance);
+
+        policiesMetadata.Policies.AddRange(items);
+
+        builder.Add(endpointBuilder =>
+        {
+            endpointBuilder.Metadata.Add(policiesMetadata);
+        });
+        return builder;
+    } 
 
     public static TBuilder OutputCache<TBuilder>(this TBuilder builder, Action<OutputCachePolicyBuilder> policy) where TBuilder : IEndpointConventionBuilder
     {
@@ -29,6 +49,10 @@ public static class PolicyExtensions
         policy?.Invoke(outputCachePolicyBuilder);
 
         var policiesMetadata = new PoliciesMetadata();
+
+        // Enable caching if this method is invoked on an endpoint, extra policies can disable it
+        policiesMetadata.Policies.Add(EnableCachingPolicy.Instance);
+
         policiesMetadata.Policies.Add(outputCachePolicyBuilder.Build());
 
         builder.Add(endpointBuilder =>

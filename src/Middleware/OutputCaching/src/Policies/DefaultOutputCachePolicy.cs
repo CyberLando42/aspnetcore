@@ -39,6 +39,8 @@ public class DefaultOutputCachePolicy : IOutputCachingPolicy
 
     private static bool AttemptOutputCaching(IOutputCachingContext context)
     {
+        // TODO: Should it come from options such that it can be changed without a custom default policy?
+
         var request = context.HttpContext.Request;
 
         // Verify the method
@@ -49,7 +51,7 @@ public class DefaultOutputCachePolicy : IOutputCachingPolicy
         }
 
         // Verify existence of authorization headers
-        if (!StringValues.IsNullOrEmpty(request.Headers.Authorization))
+        if (!StringValues.IsNullOrEmpty(request.Headers.Authorization) || request.HttpContext.User?.Identity?.IsAuthenticated == true)
         {
             context.Logger.RequestWithAuthorizationNotCacheable();
             return false;

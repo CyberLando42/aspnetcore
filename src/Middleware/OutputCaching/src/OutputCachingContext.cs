@@ -27,6 +27,11 @@ public class OutputCachingContext : IOutputCachingContext
     }
 
     /// <summary>
+    /// Determine whether the output caching logic should is configured for the incoming HTTP request.
+    /// </summary>
+    public bool EnableOutputCaching { get; set; }
+
+    /// <summary>
     /// Determine whether the response caching logic should be attempted for the incoming HTTP request.
     /// </summary>
     public bool AttemptResponseCaching { get; set; }

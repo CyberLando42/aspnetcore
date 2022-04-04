@@ -3,8 +3,6 @@
 
 using Microsoft.AspNetCore.Mvc.Filters;
 using Microsoft.AspNetCore.OutputCaching;
-using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 
 namespace Microsoft.AspNetCore.Mvc;
 
@@ -61,7 +59,9 @@ public class OutputCacheAttribute : Attribute, IOrderedFilter, IPoliciesMetadata
 
     private List<IOutputCachingPolicy> GetPolicies()
     {
-        var policies = new List<IOutputCachingPolicy>(4);
+        var policies = new List<IOutputCachingPolicy>(5);
+
+        policies.Add(ConfigureCachingPolicy.Instance);
 
         if (_noStore != null && _noStore.Value)
         {

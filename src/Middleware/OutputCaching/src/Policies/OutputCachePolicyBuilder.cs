@@ -12,14 +12,6 @@ public class OutputCachePolicyBuilder
     private List<IOutputCachingPolicy> Policies { get; } = new();
     private List<Func<IOutputCachingContext, Task<bool>>> Requirements { get; } = new();
 
-    public OutputCachePolicyBuilder(bool useDefaultPolicy = true)
-    {
-        if (useDefaultPolicy)
-        {
-            Policies.Add(new DefaultOutputCachePolicy());
-        }
-    }
-
     public OutputCachePolicyBuilder When(Func<IOutputCachingContext, Task<bool>> predicate)
     {
         Requirements.Add(predicate);
@@ -36,7 +28,6 @@ public class OutputCachePolicyBuilder
             return Task.FromResult(match);
         });
         return this;
-
     }
 
     public OutputCachePolicyBuilder Path(params PathString[] pathBases)
@@ -49,7 +40,6 @@ public class OutputCachePolicyBuilder
             return Task.FromResult(match);
         });
         return this;
-
     }
 
     public OutputCachePolicyBuilder Method(string method)
@@ -154,9 +144,9 @@ public class OutputCachePolicyBuilder
         return this;
     }
 
-    public OutputCachePolicyBuilder NotCacheable()
+    public OutputCachePolicyBuilder NoStore()
     {
-        Policies.Add(new NoCachingPolicy());
+        Policies.Add(new NoStorePolicy());
         return this;
     }
 
